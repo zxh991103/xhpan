@@ -2,6 +2,7 @@ from flask import Flask,render_template,request,redirect,url_for
 from flask import request
 from werkzeug.utils import secure_filename
 import os
+import test
 app = Flask(__name__)
 
 @app.route('/')
@@ -30,7 +31,41 @@ def upload():
     return render_template('upload.html')
 
 
+def html(list1):
+    list1.sort()
+    s=""
+    for i in list1:
+        
+        s=s+i
+        s=s+"</a>"
+        
+    
+    return s
+    
+
+@app.route('/delete',methods=['GET','POST'])
+def delete():
+   
+    delname=['delname']
+    dellist=test.list_dir('/var/www/html')
+    
+    
+    str1=html(dellist)
+    dellist=str1.split('</a>')
+    if request.method=='POST':
+        
+        nm=request.form['nm']
+        print(type(nm),nm)
+        sudoPassword = '991103'
+        command = 'rm '+'  /var/www/html/'+nm
+        os.system('echo %s|sudo -S %s' % (sudoPassword, command))
+        
+        return redirect(url_for('delete'))
+    
+    return render_template('delete.html',content=dellist,labels=delname)
+
+
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0')
+    app.run(host='0.0.0.0',debug=True)
     
